@@ -24,7 +24,19 @@ if (ENV === "development") {
 
 //ROUTER
 app.get("*", (req, res) => {
-  res.send({ hello: "express" });
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Video Player</title>
+        <link href="assets/app.css" type="text/css" rel="stylesheet">
+      </head>
+      <body>
+        <div id="app"></div>
+        <script src="assets/app.js" type="text/javascript"> </script> 
+      </body>
+    </html>
+  `);
 });
 
 app.listen(PORT, (err) => {

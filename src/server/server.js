@@ -13,6 +13,7 @@ import Layout from "../frontend/components/Layout";
 import reducer from "../frontend/reducers";
 import serverRoutes from "../frontend/routes/serverRoutes";
 import initialState from "../frontend/initialState";
+import helmet from "helmet";
 
 //ENV
 dotenv.config();
@@ -31,6 +32,11 @@ if (ENV === "development") {
   const serverConfig = { port: PORT, hot: true };
   app.use(webpackDevMiddleware(compiler, serverConfig));
   app.use(webpackHotMiddleware(compiler));
+} else {
+  app.use(express.static(`${__dirname}/public`));
+  app.use(helmet());
+  app.use(helmet.permittedCrossDomainPolicies());
+  app.disable("x-powered-by");
 }
 
 // RESPONSE

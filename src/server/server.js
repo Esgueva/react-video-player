@@ -9,6 +9,7 @@ import { Provider } from "react-redux";
 import { createStore } from "redux";
 import { renderRoutes } from "react-router-config";
 
+import Layout from "../frontend/components/Layout";
 import reducer from "../frontend/reducers";
 import serverRoutes from "../frontend/routes/serverRoutes";
 import initialState from "../frontend/initialState";
@@ -55,7 +56,7 @@ const renderApp = (req, res) => {
   const html = renderToString(
     <Provider store={store}>
       <StaticRouter location={req.url} contest={{}}>
-        {renderRoutes(serverRoutes)}
+        <Layout>{renderRoutes(serverRoutes)}</Layout>∫
       </StaticRouter>
     </Provider>
   );

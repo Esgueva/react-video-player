@@ -14,6 +14,7 @@ import reducer from "../frontend/reducers";
 import serverRoutes from "../frontend/routes/serverRoutes";
 import initialState from "../frontend/initialState";
 import helmet from "helmet";
+import getManifest from "./getManifest";
 
 //ENV
 dotenv.config();
@@ -33,6 +34,10 @@ if (ENV === "development") {
   app.use(webpackDevMiddleware(compiler, serverConfig));
   app.use(webpackHotMiddleware(compiler));
 } else {
+  app.use((req, res, next) => {
+    if (!req.hashManifest) req.hashManifest = getManifest();
+    next();
+  });
   app.use(express.static(`${__dirname}/public`));
   app.use(helmet());
   app.use(helmet.permittedCrossDomainPolicies());
@@ -40,13 +45,16 @@ if (ENV === "development") {
 }
 
 // RESPONSE
-const setResponse = (html, preloadedState) => {
+const setResponse = (html, preloadedState, manifest) => {
+  const mainStyles = manifest ? manifest["main.css"] : "assets/app.css";
+  const mainBuild = manifest ? manifest["main.js"] : "assets/app.js";
+
   return `
     <!DOCTYPE html>
       <html>
         <head>
           <title>Video Player</title>
-          <link href="assets/app.css" type="text/css" rel="stylesheet">
+          <link href="${mainStyles}" type="text/css" rel="stylesheet">
         </head>
         <body>
           <div id="app">${html}</div>
@@ -55,7 +63,7 @@ const setResponse = (html, preloadedState) => {
               preloadedState
             ).replace(/</g, "\\u003c")}
           </script>
-          <script src="assets/app.js" type="text/javascript"> </script> 
+          <script src="${mainBuild}" type="text/javascript"> </script> 
         </body>
       </html>
   `;
@@ -72,7 +80,7 @@ const renderApp = (req, res) => {
       </StaticRouter>
     </Provider>
   );
-  res.send(setResponse(html, preloadedState));
+  res.send(setResponse(html, preloadedState, req.hashManifest));
 };
 
 //ROUTER
